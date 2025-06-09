@@ -1,3 +1,7 @@
 module github.com/kopher1601/go_todo_app
 
-go 1.21.13
+go 1.23.0
+
+toolchain go1.23.10
+
+require golang.org/x/sync v0.15.0
