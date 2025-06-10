@@ -7,6 +7,8 @@ import (
 	"net"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/kopher1601/go_todo_app/config"
 	"golang.org/x/sync/errgroup"
@@ -31,6 +33,9 @@ func main() {
 }
 
 func run(ctx context.Context) error {
+	ctx, stop := signal.NotifyContext(ctx, os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
 	cfg, err := config.New()
 	if err != nil {
 		return err
