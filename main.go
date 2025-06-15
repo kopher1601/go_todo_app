@@ -43,6 +43,7 @@ func run(ctx context.Context, l net.Listener) error {
 
 func main() {
 	if len(os.Args) != 2 {
+		log.Println("os.Args>>>", os.Args)
 		log.Printf("need port number\n")
 		os.Exit(1)
 	}
