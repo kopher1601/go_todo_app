@@ -1,0 +1,5 @@
+package gosplearn
+
+func main() {
+
+}
