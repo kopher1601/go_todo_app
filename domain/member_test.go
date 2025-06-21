@@ -19,7 +19,11 @@ func (m *mockPasswordEncoder) Matches(password, encodedPassword string) bool {
 
 func createTestMember(t *testing.T) *Member {
 	t.Helper()
-	member, err := CreateMember("kopher@goplearn.app", "Kopher", "secret", &mockPasswordEncoder{})
+	member, err := CreateMember(&MemberCreateRequest{
+		Email:    "kopher@goplearn.app",
+		Nickname: "Kopher",
+		Password: "secret",
+	}, &mockPasswordEncoder{})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -97,4 +101,15 @@ func TestMember_Status(t *testing.T) {
 
 		assert.True(t, member.VerifyPassword("verysecret", &mockPasswordEncoder{}))
 	})
+
+	t.Run("is_active", func(t *testing.T) {
+		member := createTestMember(t)
+
+		member.Activate()
+		assert.True(t, member.IsActive())
+
+		member.Deactivate()
+		assert.False(t, member.IsActive())
+	})
+
 }
