@@ -113,3 +113,26 @@ func TestMember_Status(t *testing.T) {
 	})
 
 }
+
+func TestMemberVO(t *testing.T) {
+
+	t.Run("invalid_email_1", func(t *testing.T) {
+		member, err := CreateMember(&MemberCreateRequest{
+			Email:    "test",
+			Nickname: "Kopher",
+			Password: "secret",
+		}, &mockPasswordEncoder{})
+
+		assert.ErrorIs(t, err, ErrInvalidEmail)
+		assert.Nil(t, member)
+	})
+
+	t.Run("invalid_email_2", func(t *testing.T) {
+		member := createTestMember(t)
+
+		assert.ErrorIs(t, member.ChangeEmail("k-opher"), ErrInvalidEmail)
+
+		assert.NoError(t, member.ChangeEmail("kopher@goplearn.app"))
+		assert.Equal(t, member.email.address, "kopher@goplearn.app")
+	})
+}

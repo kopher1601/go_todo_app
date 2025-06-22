@@ -1,0 +1,20 @@
+package domain
+
+import (
+	"testing"
+
+	"github.com/stretchr/testify/assert"
+)
+
+func TestVO(t *testing.T) {
+	email1, err := NewEmail("test1@test.com")
+	assert.NoError(t, err)
+
+	email2, err := NewEmail("test1@test.com")
+	assert.NoError(t, err)
+
+	t.Run("email equality", func(t *testing.T) {
+		assert.Equal(t, email1.address, email2.address)
+		assert.Equal(t, email1, email2)
+	})
+}

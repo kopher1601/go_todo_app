@@ -1,6 +1,8 @@
 package domain
 
-import "errors"
+import (
+	"errors"
+)
 
 var ErrIllegalState = errors.New("illegal state")
 
@@ -13,7 +15,7 @@ const (
 )
 
 type Member struct {
-	email        string
+	email        Email
 	nickname     string
 	passwordHash string
 	status       MemberStatus
@@ -25,8 +27,13 @@ func CreateMember(createRequest *MemberCreateRequest, passwordEncoder PasswordEn
 		return nil, err
 	}
 
+	email, err := NewEmail(createRequest.Email)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Member{
-		email:        createRequest.Email,
+		email:        email,
 		nickname:     createRequest.Nickname,
 		passwordHash: passwordHash,
 		status:       MemberStatusPending,
@@ -57,6 +64,17 @@ func (m *Member) VerifyPassword(password string, passwordEncoder PasswordEncoder
 
 func (m *Member) ChangeNickname(nickname string) {
 	m.nickname = nickname
+}
+
+func (m *Member) ChangeEmail(address string) error {
+	email, err := NewEmail(address)
+	if err != nil {
+		return err
+	}
+
+	m.email = email
+
+	return nil
 }
 
 func (m *Member) ChangePassword(password string, passwordEncoder PasswordEncoder) error {
