@@ -15,26 +15,27 @@ const (
 )
 
 type Member struct {
+	id           int
 	email        Email
 	nickname     string
 	passwordHash string
 	status       MemberStatus
 }
 
-func CreateMember(createRequest *MemberCreateRequest, passwordEncoder PasswordEncoder) (*Member, error) {
-	passwordHash, err := passwordEncoder.Encode(createRequest.Password)
+func RegisterMember(registerRequest *MemberRegisterRequest, passwordEncoder PasswordEncoder) (*Member, error) {
+	passwordHash, err := passwordEncoder.Encode(registerRequest.Password)
 	if err != nil {
 		return nil, err
 	}
 
-	email, err := NewEmail(createRequest.Email)
+	email, err := NewEmail(registerRequest.Email)
 	if err != nil {
 		return nil, err
 	}
 
 	return &Member{
 		email:        email,
-		nickname:     createRequest.Nickname,
+		nickname:     registerRequest.Nickname,
 		passwordHash: passwordHash,
 		status:       MemberStatusPending,
 	}, nil
@@ -89,4 +90,33 @@ func (m *Member) ChangePassword(password string, passwordEncoder PasswordEncoder
 
 func (m *Member) IsActive() bool {
 	return m.status == MemberStatusActive
+}
+
+func (m *Member) SetID(id int) {
+	m.id = id
+}
+
+// id 필드 getter
+func (m *Member) ID() int {
+	return m.id
+}
+
+// email 필드 getter
+func (m *Member) Email() string {
+	return m.email.address
+}
+
+// nickname 필드 getter
+func (m *Member) Nickname() string {
+	return m.nickname
+}
+
+// passwordHash 필드 getter
+func (m *Member) PasswordHash() string {
+	return m.passwordHash
+}
+
+// status 필드 getter
+func (m *Member) Status() string {
+	return string(m.status)
 }

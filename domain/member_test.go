@@ -1,45 +1,21 @@
 package domain
 
 import (
-	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
-type mockPasswordEncoder struct{}
-
-func (m *mockPasswordEncoder) Encode(password string) (string, error) {
-	return strings.ToUpper(password), nil
-}
-
-func (m *mockPasswordEncoder) Matches(password, encodedPassword string) bool {
-	return strings.ToUpper(password) == encodedPassword
-}
-
-func createTestMember(t *testing.T) *Member {
-	t.Helper()
-	member, err := CreateMember(&MemberCreateRequest{
-		Email:    "kopher@goplearn.app",
-		Nickname: "Kopher",
-		Password: "secret",
-	}, &mockPasswordEncoder{})
-	if err != nil {
-		t.Fatal(err)
-	}
-	return member
-}
-
 func TestMember_Status(t *testing.T) {
 	t.Run("activate", func(t *testing.T) {
-		member := createTestMember(t)
+		member := CreateTestMember(t)
 		member.Activate()
 
 		assert.Equal(t, member.status, MemberStatusActive)
 	})
 
 	t.Run("activate_fail", func(t *testing.T) {
-		member := createTestMember(t)
+		member := CreateTestMember(t)
 		member.Activate()
 		err := member.Activate()
 
@@ -49,7 +25,7 @@ func TestMember_Status(t *testing.T) {
 	})
 
 	t.Run("deactivate", func(t *testing.T) {
-		member := createTestMember(t)
+		member := CreateTestMember(t)
 		member.Activate()
 		member.Deactivate()
 
@@ -57,7 +33,7 @@ func TestMember_Status(t *testing.T) {
 	})
 
 	t.Run("deactivate_fail", func(t *testing.T) {
-		member := createTestMember(t)
+		member := CreateTestMember(t)
 		err := member.Deactivate()
 
 		if ok := assert.Error(t, err); ok {
@@ -66,7 +42,7 @@ func TestMember_Status(t *testing.T) {
 	})
 
 	t.Run("deactivate_fail_twice", func(t *testing.T) {
-		member := createTestMember(t)
+		member := CreateTestMember(t)
 		member.Deactivate()
 		err := member.Deactivate()
 
@@ -76,17 +52,17 @@ func TestMember_Status(t *testing.T) {
 	})
 
 	t.Run("verify_password", func(t *testing.T) {
-		member := createTestMember(t)
+		member := CreateTestMember(t)
 		member.Activate()
-		result := member.VerifyPassword("secret", &mockPasswordEncoder{})
+		result := member.VerifyPassword("secret", &MockPasswordEncoder{})
 		assert.True(t, result)
 
-		result = member.VerifyPassword("hello", &mockPasswordEncoder{})
+		result = member.VerifyPassword("hello", &MockPasswordEncoder{})
 		assert.False(t, result)
 	})
 
 	t.Run("change_nickname", func(t *testing.T) {
-		member := createTestMember(t)
+		member := CreateTestMember(t)
 
 		assert.Equal(t, member.nickname, "Kopher")
 		member.ChangeNickname("Koma")
@@ -95,15 +71,15 @@ func TestMember_Status(t *testing.T) {
 	})
 
 	t.Run("change_password", func(t *testing.T) {
-		member := createTestMember(t)
+		member := CreateTestMember(t)
 
-		member.ChangePassword("verysecret", &mockPasswordEncoder{})
+		member.ChangePassword("verysecret", &MockPasswordEncoder{})
 
-		assert.True(t, member.VerifyPassword("verysecret", &mockPasswordEncoder{}))
+		assert.True(t, member.VerifyPassword("verysecret", &MockPasswordEncoder{}))
 	})
 
 	t.Run("is_active", func(t *testing.T) {
-		member := createTestMember(t)
+		member := CreateTestMember(t)
 
 		member.Activate()
 		assert.True(t, member.IsActive())
@@ -117,18 +93,18 @@ func TestMember_Status(t *testing.T) {
 func TestMemberVO(t *testing.T) {
 
 	t.Run("invalid_email_1", func(t *testing.T) {
-		member, err := CreateMember(&MemberCreateRequest{
+		member, err := RegisterMember(&MemberRegisterRequest{
 			Email:    "test",
 			Nickname: "Kopher",
 			Password: "secret",
-		}, &mockPasswordEncoder{})
+		}, &MockPasswordEncoder{})
 
 		assert.ErrorIs(t, err, ErrInvalidEmail)
 		assert.Nil(t, member)
 	})
 
 	t.Run("invalid_email_2", func(t *testing.T) {
-		member := createTestMember(t)
+		member := CreateTestMember(t)
 
 		assert.ErrorIs(t, member.ChangeEmail("k-opher"), ErrInvalidEmail)
 

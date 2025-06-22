@@ -1,6 +1,6 @@
 package domain
 
-type MemberCreateRequest struct {
+type MemberRegisterRequest struct {
 	Email    string
 	Nickname string
 	Password string
