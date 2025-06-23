@@ -29,7 +29,7 @@ func (m *memberRepository) Save(ctx context.Context, member *domain.Member) (*do
 		SetEmail(member.Email().Address).
 		SetNickname(member.Nickname()).
 		SetPasswordHash(member.PasswordHash()).
-		SetStatus(member.Status()).
+		SetStatus(string(member.Status())).
 		Save(ctx)
 	if err != nil {
 		log.Println(err)

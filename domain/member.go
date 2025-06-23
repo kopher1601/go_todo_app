@@ -117,6 +117,6 @@ func (m *Member) PasswordHash() string {
 }
 
 // status 필드 getter
-func (m *Member) Status() string {
-	return string(m.status)
+func (m *Member) Status() MemberStatus {
+	return m.status
 }

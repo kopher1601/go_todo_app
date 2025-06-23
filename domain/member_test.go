@@ -54,10 +54,10 @@ func TestMember_Status(t *testing.T) {
 	t.Run("verify_password", func(t *testing.T) {
 		member := CreateTestMember(t)
 		member.Activate()
-		result := member.VerifyPassword("secret", &MockPasswordEncoder{})
+		result := member.VerifyPassword("secret", &mockPasswordEncoder{})
 		assert.True(t, result)
 
-		result = member.VerifyPassword("hello", &MockPasswordEncoder{})
+		result = member.VerifyPassword("hello", &mockPasswordEncoder{})
 		assert.False(t, result)
 	})
 
@@ -73,9 +73,9 @@ func TestMember_Status(t *testing.T) {
 	t.Run("change_password", func(t *testing.T) {
 		member := CreateTestMember(t)
 
-		member.ChangePassword("verysecret", &MockPasswordEncoder{})
+		member.ChangePassword("verysecret", &mockPasswordEncoder{})
 
-		assert.True(t, member.VerifyPassword("verysecret", &MockPasswordEncoder{}))
+		assert.True(t, member.VerifyPassword("verysecret", &mockPasswordEncoder{}))
 	})
 
 	t.Run("is_active", func(t *testing.T) {
@@ -97,7 +97,7 @@ func TestMemberVO(t *testing.T) {
 			Email:    "test",
 			Nickname: "Kopher",
 			Password: "secret",
-		}, &MockPasswordEncoder{})
+		}, &mockPasswordEncoder{})
 
 		assert.ErrorIs(t, err, ErrInvalidEmail)
 		assert.Nil(t, member)

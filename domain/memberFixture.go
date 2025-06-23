@@ -5,23 +5,31 @@ import (
 	"testing"
 )
 
-type MockPasswordEncoder struct{}
+type mockPasswordEncoder struct{}
 
-func (m *MockPasswordEncoder) Encode(password string) (string, error) {
+func NewMockPasswordEncoder() *mockPasswordEncoder {
+	return &mockPasswordEncoder{}
+}
+
+func (m *mockPasswordEncoder) Encode(password string) (string, error) {
 	return strings.ToUpper(password), nil
 }
 
-func (m *MockPasswordEncoder) Matches(password, encodedPassword string) bool {
+func (m *mockPasswordEncoder) Matches(password, encodedPassword string) bool {
 	return strings.ToUpper(password) == encodedPassword
+}
+
+func CreateMockMemgerRegisterRequest() *MemberRegisterRequest {
+	return &MemberRegisterRequest{
+		Email:    "kopher@goplearn.app",
+		Nickname: "Kopher",
+		Password: "secret",
+	}
 }
 
 func CreateTestMember(t *testing.T) *Member {
 	t.Helper()
-	member, err := RegisterMember(&MemberRegisterRequest{
-		Email:    "kopher@goplearn.app",
-		Nickname: "Kopher",
-		Password: "secret",
-	}, &MockPasswordEncoder{})
+	member, err := RegisterMember(CreateMockMemgerRegisterRequest(), NewMockPasswordEncoder())
 	if err != nil {
 		t.Fatal(err)
 	}
