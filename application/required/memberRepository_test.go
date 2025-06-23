@@ -39,3 +39,20 @@ func TestMemberRepository_Save(t *testing.T) {
 	assert.NotNil(t, savedMember)
 	assert.Equal(t, member.Email(), "kopher@goplearn.app")
 }
+
+func TestMemberRepository_DuplicateEmail(t *testing.T) {
+	client := setupTestDB(t)
+	defer client.Close()
+
+	ctx := context.Background()
+	repo := NewMemberRepository(client)
+
+	member := domain.CreateTestMember(t)
+	_, err := repo.Save(ctx, member)
+	assert.NoError(t, err)
+
+	member2 := domain.CreateTestMember(t)
+	_, err = repo.Save(ctx, member2)
+	assert.Error(t, err)
+	assert.True(t, ent.IsConstraintError(err))
+}
