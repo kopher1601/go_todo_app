@@ -10,7 +10,7 @@ const EmailPattern = `^[a-zA-Z0-9.!#$%&'*+/=?^_{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-
 var ErrInvalidEmail = errors.New("invalid email format")
 
 type Email struct {
-	address string
+	Address string
 }
 
 func isValidEmail(email string) bool {
@@ -22,5 +22,5 @@ func NewEmail(address string) (Email, error) {
 		return Email{}, ErrInvalidEmail
 	}
 
-	return Email{address: address}, nil
+	return Email{Address: address}, nil
 }

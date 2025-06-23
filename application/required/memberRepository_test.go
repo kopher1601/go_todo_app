@@ -37,7 +37,7 @@ func TestMemberRepository_Save(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.NotNil(t, savedMember)
-	assert.Equal(t, member.Email(), "kopher@goplearn.app")
+	assert.Equal(t, member.Email().Address, "kopher@goplearn.app")
 }
 
 func TestMemberRepository_DuplicateEmail(t *testing.T) {

@@ -109,6 +109,6 @@ func TestMemberVO(t *testing.T) {
 		assert.ErrorIs(t, member.ChangeEmail("k-opher"), ErrInvalidEmail)
 
 		assert.NoError(t, member.ChangeEmail("kopher@goplearn.app"))
-		assert.Equal(t, member.email.address, "kopher@goplearn.app")
+		assert.Equal(t, member.email.Address, "kopher@goplearn.app")
 	})
 }

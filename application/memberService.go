@@ -1,0 +1,45 @@
+package application
+
+import (
+	"context"
+	"goplearn/application/provided"
+	"goplearn/application/required"
+	"goplearn/domain"
+)
+
+type memberRegister struct {
+	memberRepository required.MemberRepository
+	emailSender      required.EmailSender
+	passwordEncoder  domain.PasswordEncoder
+}
+
+func NewMemberRegister(
+	memberRepository required.MemberRepository,
+	emailSender required.EmailSender,
+	passwordEncoder domain.PasswordEncoder,
+) provided.MemberRegister {
+	return &memberRegister{
+		memberRepository: memberRepository,
+		emailSender:      emailSender,
+		passwordEncoder:  passwordEncoder,
+	}
+}
+
+func (m *memberRegister) Register(ctx context.Context, registerRequest *domain.MemberRegisterRequest) (*domain.Member, error) {
+	member, err := domain.RegisterMember(registerRequest, m.passwordEncoder)
+	if err != nil {
+		return nil, err
+	}
+
+	member, err = m.memberRepository.Save(ctx, member)
+	if err != nil {
+		return nil, err
+	}
+
+	err = m.emailSender.Send(ctx, member.Email(), "登録を完了してください", "下記のリンクをクリックして登録を完了してください")
+	if err != nil {
+		return nil, err
+	}
+
+	return member, nil
+}

@@ -102,8 +102,8 @@ func (m *Member) ID() int {
 }
 
 // email 필드 getter
-func (m *Member) Email() string {
-	return m.email.address
+func (m *Member) Email() *Email {
+	return &m.email
 }
 
 // nickname 필드 getter
