@@ -2,9 +2,12 @@ package application
 
 import (
 	"context"
+	"fmt"
 	"goplearn/application/provided"
 	"goplearn/application/required"
 	"goplearn/domain"
+
+	"github.com/go-playground/validator"
 )
 
 type memberRegister struct {
@@ -26,6 +29,14 @@ func NewMemberRegister(
 }
 
 func (m *memberRegister) Register(ctx context.Context, registerRequest *domain.MemberRegisterRequest) (*domain.Member, error) {
+	if err := registerRequest.Validate(); err != nil {
+		validationErrors := err.(validator.ValidationErrors)
+		for _, err := range validationErrors {
+			fmt.Println(err.Field(), err.Tag())
+		}
+		return nil, err
+	}
+
 	member, err := domain.RegisterMember(registerRequest, m.passwordEncoder)
 	if err != nil {
 		return nil, err
