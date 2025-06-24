@@ -1,9 +1,11 @@
 package domain
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	gomock "go.uber.org/mock/gomock"
 )
 
 func TestMember_Status(t *testing.T) {
@@ -54,10 +56,16 @@ func TestMember_Status(t *testing.T) {
 	t.Run("verify_password", func(t *testing.T) {
 		member := CreateTestMember(t)
 		member.Activate()
-		result := member.VerifyPassword("secret", &mockPasswordEncoder{})
+
+		ctrl := gomock.NewController(t)
+		mpe := NewMockPasswordEncoder(ctrl)
+		mpe.EXPECT().Matches(gomock.Any(), gomock.Any()).Return(true)
+
+		result := member.VerifyPassword("SECRET", mpe)
 		assert.True(t, result)
 
-		result = member.VerifyPassword("hello", &mockPasswordEncoder{})
+		mpe.EXPECT().Matches(gomock.Any(), gomock.Any()).Return(false)
+		result = member.VerifyPassword("HELLO", mpe)
 		assert.False(t, result)
 	})
 
@@ -73,9 +81,17 @@ func TestMember_Status(t *testing.T) {
 	t.Run("change_password", func(t *testing.T) {
 		member := CreateTestMember(t)
 
-		member.ChangePassword("verysecret", &mockPasswordEncoder{})
+		ctrl := gomock.NewController(t)
+		mpe := NewMockPasswordEncoder(ctrl)
+		mpe.EXPECT().Encode(gomock.Any()).DoAndReturn(
+			func(password string) (string, error) {
+				return strings.ToUpper(password), nil
+			})
 
-		assert.True(t, member.VerifyPassword("verysecret", &mockPasswordEncoder{}))
+		member.ChangePassword("verysecret", mpe)
+
+		mpe.EXPECT().Matches(gomock.Any(), gomock.Any()).Return(true)
+		assert.True(t, member.VerifyPassword("VERYSECRET", mpe))
 	})
 
 	t.Run("is_active", func(t *testing.T) {
@@ -93,11 +109,18 @@ func TestMember_Status(t *testing.T) {
 func TestMemberVO(t *testing.T) {
 
 	t.Run("invalid_email_1", func(t *testing.T) {
+		ctrl := gomock.NewController(t)
+		mpe := NewMockPasswordEncoder(ctrl)
+		mpe.EXPECT().Encode(gomock.Any()).DoAndReturn(
+			func(password string) (string, error) {
+				return strings.ToUpper(password), nil
+			})
+
 		member, err := RegisterMember(&MemberRegisterRequest{
 			Email:    "test",
 			Nickname: "Kopher",
 			Password: "secret",
-		}, &mockPasswordEncoder{})
+		}, mpe)
 
 		assert.ErrorIs(t, err, ErrInvalidEmail)
 		assert.Nil(t, member)
