@@ -67,9 +67,6 @@ func (m *memberRegister) Activate(ctx context.Context, memberId string) error {
 	}
 
 	_, err = m.memberRepository.Update(ctx, member)
-	if err != nil {
-		return err
-	}
 
 	return nil
 }
