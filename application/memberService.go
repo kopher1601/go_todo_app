@@ -54,3 +54,22 @@ func (m *memberRegister) Register(ctx context.Context, registerRequest *domain.M
 
 	return member, nil
 }
+
+func (m *memberRegister) Activate(ctx context.Context, memberId string) error {
+	member, err := m.memberRepository.FindByID(ctx, memberId)
+	if err != nil {
+		return err
+	}
+
+	err = member.Activate()
+	if err != nil {
+		return err
+	}
+
+	_, err = m.memberRepository.Update(ctx, member)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

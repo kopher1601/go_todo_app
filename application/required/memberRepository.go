@@ -10,6 +10,8 @@ import (
 // 会員の情報を保存や検索できる
 type MemberRepository interface {
 	Save(ctx context.Context, member *domain.Member) (*domain.Member, error)
+	FindByID(ctx context.Context, memberId string) (*domain.Member, error)
+	Update(ctx context.Context, member *domain.Member) (*domain.Member, error)
 }
 
 func NewMemberRepository(client *ent.Client) MemberRepository {
@@ -38,4 +40,37 @@ func (m *memberRepository) Save(ctx context.Context, member *domain.Member) (*do
 
 	member.SetID(savedMember.ID)
 	return member, nil
+}
+
+func (m *memberRepository) FindByID(ctx context.Context, memberId string) (*domain.Member, error) {
+	panic("unimplemented")
+}
+
+func (m *memberRepository) Update(ctx context.Context, member *domain.Member) (*domain.Member, error) {
+	updatedMember, err := m.client.Member.UpdateOne(
+		&ent.Member{
+			Email:        member.Email().Address,
+			Nickname:     member.Nickname(),
+			PasswordHash: member.PasswordHash(),
+			Status:       string(member.Status()),
+		},
+	).Save(ctx)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	email, err := domain.NewEmail(updatedMember.Email)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return domain.NewMember(
+		updatedMember.ID,
+		email,
+		updatedMember.Nickname,
+		updatedMember.PasswordHash,
+		domain.MemberStatus(updatedMember.Status),
+	), nil
 }

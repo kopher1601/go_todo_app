@@ -41,6 +41,16 @@ func RegisterMember(registerRequest *MemberRegisterRequest, passwordEncoder Pass
 	}, nil
 }
 
+func NewMember(id int, email Email, nickname string, passwordHash string, status MemberStatus) *Member {
+	return &Member{
+		id:           id,
+		email:        email,
+		nickname:     nickname,
+		passwordHash: passwordHash,
+		status:       status,
+	}
+}
+
 func (m *Member) Activate() error {
 	if m.status != MemberStatusPending {
 		return ErrIllegalState
