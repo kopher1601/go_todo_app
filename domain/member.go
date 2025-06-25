@@ -6,14 +6,6 @@ import (
 
 var ErrIllegalState = errors.New("illegal state")
 
-type MemberStatus string
-
-const (
-	MemberStatusPending     MemberStatus = "PENDING"
-	MemberStatusActive      MemberStatus = "ACTIVE"
-	MemberStatusDeactivated MemberStatus = "DEACTIVATED"
-)
-
 type Member struct {
 	id           int
 	email        Email
