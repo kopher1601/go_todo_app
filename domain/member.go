@@ -7,11 +7,11 @@ import (
 var ErrIllegalState = errors.New("illegal state")
 
 type Member struct {
-	id           int
-	email        Email
-	nickname     string
-	passwordHash string
-	status       MemberStatus
+	ID           int
+	Email        Email
+	Nickname     string
+	PasswordHash string
+	Status       MemberStatus
 }
 
 func RegisterMember(registerRequest *MemberRegisterRequest, passwordEncoder PasswordEncoder) (*Member, error) {
@@ -26,47 +26,47 @@ func RegisterMember(registerRequest *MemberRegisterRequest, passwordEncoder Pass
 	}
 
 	return &Member{
-		email:        email,
-		nickname:     registerRequest.Nickname,
-		passwordHash: passwordHash,
-		status:       MemberStatusPending,
+		Email:        email,
+		Nickname:     registerRequest.Nickname,
+		PasswordHash: passwordHash,
+		Status:       MemberStatusPending,
 	}, nil
 }
 
 func NewMember(id int, email Email, nickname string, passwordHash string, status MemberStatus) *Member {
 	return &Member{
-		id:           id,
-		email:        email,
-		nickname:     nickname,
-		passwordHash: passwordHash,
-		status:       status,
+		ID:           id,
+		Email:        email,
+		Nickname:     nickname,
+		PasswordHash: passwordHash,
+		Status:       status,
 	}
 }
 
 func (m *Member) Activate() error {
-	if m.status != MemberStatusPending {
+	if m.Status != MemberStatusPending {
 		return ErrIllegalState
 	}
 
-	m.status = MemberStatusActive
+	m.Status = MemberStatusActive
 	return nil
 }
 
 func (m *Member) Deactivate() error {
-	if m.status != MemberStatusActive {
+	if m.Status != MemberStatusActive {
 		return ErrIllegalState
 	}
 
-	m.status = MemberStatusDeactivated
+	m.Status = MemberStatusDeactivated
 	return nil
 }
 
 func (m *Member) VerifyPassword(password string, passwordEncoder PasswordEncoder) bool {
-	return passwordEncoder.Matches(password, m.passwordHash)
+	return passwordEncoder.Matches(password, m.PasswordHash)
 }
 
 func (m *Member) ChangeNickname(nickname string) {
-	m.nickname = nickname
+	m.Nickname = nickname
 }
 
 func (m *Member) ChangeEmail(address string) error {
@@ -75,7 +75,7 @@ func (m *Member) ChangeEmail(address string) error {
 		return err
 	}
 
-	m.email = email
+	m.Email = email
 
 	return nil
 }
@@ -86,39 +86,14 @@ func (m *Member) ChangePassword(password string, passwordEncoder PasswordEncoder
 		return err
 	}
 
-	m.passwordHash = passwordHash
+	m.PasswordHash = passwordHash
 	return nil
 }
 
 func (m *Member) IsActive() bool {
-	return m.status == MemberStatusActive
+	return m.Status == MemberStatusActive
 }
 
 func (m *Member) SetID(id int) {
-	m.id = id
-}
-
-// id 필드 getter
-func (m *Member) ID() int {
-	return m.id
-}
-
-// email 필드 getter
-func (m *Member) Email() *Email {
-	return &m.email
-}
-
-// nickname 필드 getter
-func (m *Member) Nickname() string {
-	return m.nickname
-}
-
-// passwordHash 필드 getter
-func (m *Member) PasswordHash() string {
-	return m.passwordHash
-}
-
-// status 필드 getter
-func (m *Member) Status() MemberStatus {
-	return m.status
+	m.ID = id
 }

@@ -28,10 +28,10 @@ type memberRepository struct {
 func (m *memberRepository) Save(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	// 会員の情報を保存する
 	savedMember, err := m.client.Member.Create().
-		SetEmail(member.Email().Address).
-		SetNickname(member.Nickname()).
-		SetPasswordHash(member.PasswordHash()).
-		SetStatus(string(member.Status())).
+		SetEmail(member.Email.Address).
+		SetNickname(member.Nickname).
+		SetPasswordHash(member.PasswordHash).
+		SetStatus(member.Status.String()).
 		Save(ctx)
 	if err != nil {
 		log.Println(err)
@@ -49,10 +49,10 @@ func (m *memberRepository) FindByID(ctx context.Context, memberId string) (*doma
 func (m *memberRepository) Update(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	updatedMember, err := m.client.Member.UpdateOne(
 		&ent.Member{
-			Email:        member.Email().Address,
-			Nickname:     member.Nickname(),
-			PasswordHash: member.PasswordHash(),
-			Status:       string(member.Status()),
+			Email:        member.Email.Address,
+			Nickname:     member.Nickname,
+			PasswordHash: member.PasswordHash,
+			Status:       member.Status.String(),
 		},
 	).Save(ctx)
 	if err != nil {
@@ -71,6 +71,6 @@ func (m *memberRepository) Update(ctx context.Context, member *domain.Member) (*
 		email,
 		updatedMember.Nickname,
 		updatedMember.PasswordHash,
-		domain.MemberStatus(updatedMember.Status),
+		domain.NewMemberStatus(updatedMember.Status),
 	), nil
 }

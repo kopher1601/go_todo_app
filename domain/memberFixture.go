@@ -7,25 +7,11 @@ import (
 	gomock "go.uber.org/mock/gomock"
 )
 
-// type mockPasswordEncoder struct{}
-
-// func NewMockPasswordEncoder() *mockPasswordEncoder {
-// 	return &mockPasswordEncoder{}
-// }
-
-// func (m *mockPasswordEncoder) Encode(password string) (string, error) {
-// 	return strings.ToUpper(password), nil
-// }
-
-// func (m *mockPasswordEncoder) Matches(password, encodedPassword string) bool {
-// 	return strings.ToUpper(password) == encodedPassword
-// }
-
-func CreateMockMemgerRegisterRequest() *MemberRegisterRequest {
+func CreateMockMemberRegisterRequest() *MemberRegisterRequest {
 	return &MemberRegisterRequest{
 		Email:    "kopher@goplearn.app",
 		Nickname: "Kopher",
-		Password: "secret",
+		Password: "secretpassword",
 	}
 }
 
@@ -39,7 +25,7 @@ func CreateTestMember(t *testing.T) *Member {
 			return strings.ToUpper(password), nil
 		})
 
-	member, err := RegisterMember(CreateMockMemgerRegisterRequest(), mpe)
+	member, err := RegisterMember(CreateMockMemberRegisterRequest(), mpe)
 	if err != nil {
 		t.Fatal(err)
 	}

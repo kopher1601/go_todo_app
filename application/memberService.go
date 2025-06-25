@@ -7,7 +7,7 @@ import (
 	"goplearn/application/required"
 	"goplearn/domain"
 
-	"github.com/go-playground/validator"
+	"github.com/go-playground/validator/v10"
 )
 
 type memberRegister struct {
@@ -47,7 +47,7 @@ func (m *memberRegister) Register(ctx context.Context, registerRequest *domain.M
 		return nil, err
 	}
 
-	err = m.emailSender.Send(ctx, member.Email(), "登録を完了してください", "下記のリンクをクリックして登録を完了してください")
+	err = m.emailSender.Send(ctx, member.Email, "登録を完了してください", "下記のリンクをクリックして登録を完了してください")
 	if err != nil {
 		return nil, err
 	}

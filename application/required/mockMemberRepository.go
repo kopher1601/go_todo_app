@@ -41,6 +41,21 @@ func (m *MockMemberRepository) EXPECT() *MockMemberRepositoryMockRecorder {
 	return m.recorder
 }
 
+// FindByID mocks base method.
+func (m *MockMemberRepository) FindByID(ctx context.Context, memberId string) (*domain.Member, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "FindByID", ctx, memberId)
+	ret0, _ := ret[0].(*domain.Member)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// FindByID indicates an expected call of FindByID.
+func (mr *MockMemberRepositoryMockRecorder) FindByID(ctx, memberId any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "FindByID", reflect.TypeOf((*MockMemberRepository)(nil).FindByID), ctx, memberId)
+}
+
 // Save mocks base method.
 func (m *MockMemberRepository) Save(ctx context.Context, member *domain.Member) (*domain.Member, error) {
 	m.ctrl.T.Helper()
@@ -54,4 +69,19 @@ func (m *MockMemberRepository) Save(ctx context.Context, member *domain.Member) 
 func (mr *MockMemberRepositoryMockRecorder) Save(ctx, member any) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Save", reflect.TypeOf((*MockMemberRepository)(nil).Save), ctx, member)
+}
+
+// Update mocks base method.
+func (m *MockMemberRepository) Update(ctx context.Context, member *domain.Member) (*domain.Member, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Update", ctx, member)
+	ret0, _ := ret[0].(*domain.Member)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Update indicates an expected call of Update.
+func (mr *MockMemberRepositoryMockRecorder) Update(ctx, member any) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Update", reflect.TypeOf((*MockMemberRepository)(nil).Update), ctx, member)
 }

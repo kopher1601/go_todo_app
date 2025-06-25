@@ -27,7 +27,7 @@ func TestMemberRegister_MockGen(t *testing.T) {
 			})
 
 	mes.EXPECT().
-		Send(gomock.Any(), gomock.AssignableToTypeOf(&domain.Email{}), gomock.Any(), gomock.Any()).
+		Send(gomock.Any(), gomock.AssignableToTypeOf(domain.Email{}), gomock.Any(), gomock.Any()).
 		Times(1).
 		Return(nil)
 
@@ -44,16 +44,16 @@ func TestMemberRegister_MockGen(t *testing.T) {
 		mpe,
 	)
 
-	member, err := memberRegister.Register(context.Background(), domain.CreateMockMemgerRegisterRequest())
+	member, err := memberRegister.Register(context.Background(), domain.CreateMockMemberRegisterRequest())
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	assert.NoError(t, err)
 	assert.NotNil(t, member)
-	assert.Equal(t, member.ID(), 1)
-	assert.Equal(t, member.Email().Address, "kopher@goplearn.app")
-	assert.Equal(t, member.Nickname(), "Kopher")
-	assert.Equal(t, member.PasswordHash(), "SECRET")
-	assert.Equal(t, member.Status(), domain.MemberStatusPending)
+	assert.Equal(t, member.ID, 1)
+	assert.Equal(t, member.Email.Address, "kopher@goplearn.app")
+	assert.Equal(t, member.Nickname, "Kopher")
+	assert.Equal(t, member.PasswordHash, "SECRETPASSWORD")
+	assert.Equal(t, member.Status, domain.MemberStatusPending)
 }

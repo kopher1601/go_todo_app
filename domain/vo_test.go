@@ -13,7 +13,7 @@ func TestVO(t *testing.T) {
 	email2, err := NewEmail("test1@test.com")
 	assert.NoError(t, err)
 
-	t.Run("email equality", func(t *testing.T) {
+	t.Run("Email equality", func(t *testing.T) {
 		assert.Equal(t, email1.Address, email2.Address)
 		assert.Equal(t, email1, email2)
 	})

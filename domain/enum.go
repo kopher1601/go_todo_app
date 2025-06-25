@@ -8,6 +8,20 @@ const (
 	MemberStatusDeactivated
 )
 
+func NewMemberStatus(status string) MemberStatus {
+	switch status {
+	case "PENDING":
+		return MemberStatusPending
+	case "ACTIVE":
+		return MemberStatusActive
+	case "DEACTIVATED":
+		return MemberStatusDeactivated
+	default:
+		return MemberStatusPending
+	}
+
+}
+
 func (m MemberStatus) String() string {
 	switch m {
 	case MemberStatusPending:

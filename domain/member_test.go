@@ -11,46 +11,45 @@ import (
 func TestMember_Status(t *testing.T) {
 	t.Run("activate", func(t *testing.T) {
 		member := CreateTestMember(t)
-		member.Activate()
+		_ = member.Activate()
 
-		assert.Equal(t, member.status, MemberStatusActive)
+		assert.Equal(t, member.Status, MemberStatusActive)
 	})
 
 	t.Run("activate_fail", func(t *testing.T) {
 		member := CreateTestMember(t)
-		member.Activate()
+
+		_ = member.Activate()
 		err := member.Activate()
 
-		if ok := assert.Error(t, err); ok {
-			assert.Equal(t, err, ErrIllegalState)
-		}
+		assert.ErrorIs(t, err, ErrIllegalState)
 	})
 
 	t.Run("deactivate", func(t *testing.T) {
 		member := CreateTestMember(t)
-		member.Activate()
-		member.Deactivate()
 
-		assert.Equal(t, member.status, MemberStatusDeactivated)
+		_ = member.Activate()
+		err := member.Deactivate()
+
+		assert.NoError(t, err)
+		assert.Equal(t, member.Status, MemberStatusDeactivated)
 	})
 
 	t.Run("deactivate_fail", func(t *testing.T) {
 		member := CreateTestMember(t)
+
 		err := member.Deactivate()
 
-		if ok := assert.Error(t, err); ok {
-			assert.Equal(t, err, ErrIllegalState)
-		}
+		assert.ErrorIs(t, err, ErrIllegalState)
 	})
 
 	t.Run("deactivate_fail_twice", func(t *testing.T) {
 		member := CreateTestMember(t)
-		member.Deactivate()
+
+		_ = member.Deactivate()
 		err := member.Deactivate()
 
-		if ok := assert.Error(t, err); ok {
-			assert.Equal(t, err, ErrIllegalState)
-		}
+		assert.ErrorIs(t, err, ErrIllegalState)
 	})
 
 	t.Run("verify_password", func(t *testing.T) {
@@ -72,10 +71,10 @@ func TestMember_Status(t *testing.T) {
 	t.Run("change_nickname", func(t *testing.T) {
 		member := CreateTestMember(t)
 
-		assert.Equal(t, member.nickname, "Kopher")
+		assert.Equal(t, member.Nickname, "Kopher")
 		member.ChangeNickname("Koma")
 
-		assert.Equal(t, member.nickname, "Koma")
+		assert.Equal(t, member.Nickname, "Koma")
 	})
 
 	t.Run("change_password", func(t *testing.T) {
@@ -132,6 +131,6 @@ func TestMemberVO(t *testing.T) {
 		assert.ErrorIs(t, member.ChangeEmail("k-opher"), ErrInvalidEmail)
 
 		assert.NoError(t, member.ChangeEmail("kopher@goplearn.app"))
-		assert.Equal(t, member.email.Address, "kopher@goplearn.app")
+		assert.Equal(t, member.Email.Address, "kopher@goplearn.app")
 	})
 }

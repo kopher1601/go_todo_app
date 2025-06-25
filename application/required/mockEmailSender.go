@@ -42,7 +42,7 @@ func (m *MockEmailSender) EXPECT() *MockEmailSenderMockRecorder {
 }
 
 // Send mocks base method.
-func (m *MockEmailSender) Send(ctx context.Context, email *domain.Email, subject, body string) error {
+func (m *MockEmailSender) Send(ctx context.Context, email domain.Email, subject, body string) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "Send", ctx, email, subject, body)
 	ret0, _ := ret[0].(error)
