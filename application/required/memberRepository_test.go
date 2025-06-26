@@ -37,6 +37,7 @@ func TestMemberRepository_Save(t *testing.T) {
 		t.Fatal(err)
 	}
 	assert.NotNil(t, savedMember)
+	assert.NotNil(t, savedMember.ID)
 	assert.Equal(t, member.Email.Address, "kopher@goplearn.app")
 }
 

@@ -36,8 +36,21 @@ func (m *memberRepository) Save(ctx context.Context, member *domain.Member) (*do
 		return nil, err
 	}
 
-	member.SetID(savedMember.ID)
-	return member, nil
+	email, err := domain.NewEmail(savedMember.Email)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	status := domain.NewMemberStatus(savedMember.Status)
+
+	return &domain.Member{
+		ID:           savedMember.ID,
+		Email:        email,
+		Nickname:     savedMember.Nickname,
+		PasswordHash: savedMember.PasswordHash,
+		Status:       status,
+	}, nil
 }
 
 func (m *memberRepository) FindByID(ctx context.Context, memberId string) (*domain.Member, error) {
