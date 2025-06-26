@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-// 会員の情報を保存や検索できる
+// MemberRepository 会員の情報を保存や検索できる
 type MemberRepository interface {
 	Save(ctx context.Context, member *domain.Member) (*domain.Member, error)
 	FindByID(ctx context.Context, memberId string) (*domain.Member, error)
@@ -24,9 +24,7 @@ type memberRepository struct {
 	client *ent.Client
 }
 
-// Save implements MemberRepository.
 func (m *memberRepository) Save(ctx context.Context, member *domain.Member) (*domain.Member, error) {
-	// 会員の情報を保存する
 	savedMember, err := m.client.Member.Create().
 		SetEmail(member.Email.Address).
 		SetNickname(member.Nickname).

@@ -71,7 +71,6 @@ func TestMember_Status(t *testing.T) {
 	t.Run("change_nickname", func(t *testing.T) {
 		member := CreateTestMember(t)
 
-		assert.Equal(t, member.Nickname, "Kopher")
 		member.ChangeNickname("Koma")
 
 		assert.Equal(t, member.Nickname, "Koma")

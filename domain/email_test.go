@@ -6,7 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-func TestVO(t *testing.T) {
+func TestEmail(t *testing.T) {
 	email1, err := NewEmail("test1@test.com")
 	assert.NoError(t, err)
 
