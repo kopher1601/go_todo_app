@@ -41,7 +41,7 @@ func TestMemberRepository_Save(t *testing.T) {
 	assert.Equal(t, member.Email.Address, "kopher@goplearn.app")
 }
 
-func TestMemberRepository_DuplicateEmail(t *testing.T) {
+func TestMemberRepository_DuplicateEmailFail(t *testing.T) {
 	client := setupTestDB(t)
 	defer client.Close()
 
