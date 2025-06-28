@@ -8,6 +8,7 @@ import (
 const EmailPattern = `^[a-zA-Z0-9.!#$%&'*+/=?^_{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$`
 
 var ErrInvalidEmail = errors.New("invalid Email format")
+var ErrDuplicateEmail = errors.New("duplicate Email")
 
 type Email struct {
 	Address string

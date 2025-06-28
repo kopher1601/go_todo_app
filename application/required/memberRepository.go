@@ -4,6 +4,7 @@ import (
 	"context"
 	"goplearn/domain"
 	"goplearn/ent"
+	"goplearn/ent/member"
 	"log"
 )
 
@@ -12,6 +13,7 @@ type MemberRepository interface {
 	Save(ctx context.Context, member *domain.Member) (*domain.Member, error)
 	FindByID(ctx context.Context, memberId string) (*domain.Member, error)
 	Update(ctx context.Context, member *domain.Member) (*domain.Member, error)
+	FindByEmail(ctx context.Context, email domain.Email) (*domain.Member, error)
 }
 
 func NewMemberRepository(client *ent.Client) MemberRepository {
@@ -84,4 +86,33 @@ func (m *memberRepository) Update(ctx context.Context, member *domain.Member) (*
 		updatedMember.PasswordHash,
 		domain.NewMemberStatus(updatedMember.Status),
 	), nil
+}
+
+func (m *memberRepository) FindByEmail(ctx context.Context, email domain.Email) (*domain.Member, error) {
+	member, err := m.client.Member.Query().
+		Where(member.EmailEQ(email.Address)).
+		Only(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		log.Println(err)
+		return nil, err
+	}
+
+	domainEmail, err := domain.NewEmail(member.Email)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	status := domain.NewMemberStatus(member.Status)
+
+	return &domain.Member{
+		ID:           member.ID,
+		Email:        domainEmail,
+		Nickname:     member.Nickname,
+		PasswordHash: member.PasswordHash,
+		Status:       status,
+	}, nil
 }

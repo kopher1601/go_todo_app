@@ -28,12 +28,40 @@ func NewMemberRegister(
 	}
 }
 
-func (m *memberRegister) Register(ctx context.Context, registerRequest *domain.MemberRegisterRequest) (*domain.Member, error) {
+func validateRequest(registerRequest *domain.MemberRegisterRequest) error {
 	if err := registerRequest.Validate(); err != nil {
 		validationErrors := err.(validator.ValidationErrors)
 		for _, err := range validationErrors {
 			fmt.Println(err.Field(), err.Tag())
 		}
+		return err
+	}
+	return nil
+}
+
+func (m *memberRegister) sendWelcomeEmail(ctx context.Context, member *domain.Member) error {
+	return m.emailSender.Send(ctx, member.Email, "登録を完了してください", "下記のリンクをクリックして登録を完了してください")
+}
+
+func (m *memberRegister) checkDuplicateEmail(ctx context.Context, registerRequest *domain.MemberRegisterRequest) error {
+	email, err := domain.NewEmail(registerRequest.Email)
+	if err != nil {
+		return err
+	}
+	if foundEmail, err := m.memberRepository.FindByEmail(ctx, email); err == nil && foundEmail != nil {
+		return domain.ErrDuplicateEmail
+	}
+	return nil
+}
+
+func (m *memberRegister) Register(ctx context.Context, registerRequest *domain.MemberRegisterRequest) (*domain.Member, error) {
+	err := validateRequest(registerRequest)
+	if err != nil {
+		return nil, err
+	}
+
+	err = m.checkDuplicateEmail(ctx, registerRequest)
+	if err != nil {
 		return nil, err
 	}
 
@@ -47,7 +75,7 @@ func (m *memberRegister) Register(ctx context.Context, registerRequest *domain.M
 		return nil, err
 	}
 
-	err = m.emailSender.Send(ctx, member.Email, "登録を完了してください", "下記のリンクをクリックして登録を完了してください")
+	err = m.sendWelcomeEmail(ctx, member)
 	if err != nil {
 		return nil, err
 	}

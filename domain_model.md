@@ -15,7 +15,8 @@
 _Entity_
 
 #### 속성
-- `email`: 이메일 - ID
+- `id` : `int`
+- `email`: 이메일 - Natural ID
 - `nickname`: 닉네임
 - `passwordHash`: 비밀번호 해시
 - `status`: 회원 상태(`MemberStatus`)
@@ -35,6 +36,9 @@ _Entity_
 - 등록 대기 상태에서만 등록 완료가 될 수 있다
 - 등록 완료 상태에서는 탈퇴할 수 있다
 - 회원의 비밀번호는 해시를 만들어서 저장한다
+
+### ErrDuplicateEmail
+_Exception_
 
 ### 회원 상태(`MemberStatus`)
 _Enum_
