@@ -5,14 +5,29 @@ import (
 	"goplearn/application"
 	"goplearn/application/required"
 	"goplearn/domain"
+	"goplearn/ent"
 	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	gomock "go.uber.org/mock/gomock"
 )
 
+func setupTestDB(t *testing.T) *ent.Client {
+	// 테스트용 데이터베이스 설정
+	client, err := ent.Open("sqlite3", "file:ent?mode=memory&cache=shared&_fk=1")
+	require.NoError(t, err)
+
+	// 스키마 생성
+	err = client.Schema.Create(context.Background())
+	require.NoError(t, err)
+
+	return client
+}
+
 func TestMemberRegister_MockGen(t *testing.T) {
+	client := setupTestDB(t)
 	ctrl := gomock.NewController(t)
 	mrm := required.NewMockMemberRepository(ctrl)
 	mes := required.NewMockEmailSender(ctrl)
@@ -43,6 +58,7 @@ func TestMemberRegister_MockGen(t *testing.T) {
 			})
 
 	memberRegister := application.NewMemberRegister(
+		client,
 		mrm,
 		mes,
 		mpe,

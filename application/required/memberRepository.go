@@ -1,3 +1,4 @@
+//go:generate mockgen -source=memberRepository.go -destination=mockMemberRepository.go -package required
 package required
 
 import (
@@ -10,7 +11,7 @@ import (
 
 // MemberRepository 会員の情報を保存や検索できる
 type MemberRepository interface {
-	Save(ctx context.Context, member *domain.Member) (*domain.Member, error)
+	Save(ctx context.Context, tx *ent.Tx, member *domain.Member) (*domain.Member, error)
 	FindByID(ctx context.Context, memberId string) (*domain.Member, error)
 	Update(ctx context.Context, member *domain.Member) (*domain.Member, error)
 	FindByEmail(ctx context.Context, email domain.Email) (*domain.Member, error)
@@ -26,8 +27,8 @@ type memberRepository struct {
 	client *ent.Client
 }
 
-func (m *memberRepository) Save(ctx context.Context, member *domain.Member) (*domain.Member, error) {
-	savedMember, err := m.client.Member.Create().
+func (m *memberRepository) Save(ctx context.Context, tx *ent.Tx, member *domain.Member) (*domain.Member, error) {
+	savedMember, err := tx.Member.Create().
 		SetEmail(member.Email.Address).
 		SetNickname(member.Nickname).
 		SetPasswordHash(member.PasswordHash).

@@ -6,22 +6,26 @@ import (
 	"goplearn/application/provided"
 	"goplearn/application/required"
 	"goplearn/domain"
+	"goplearn/ent"
 
 	"github.com/go-playground/validator/v10"
 )
 
 type memberRegister struct {
+	tx               *required.TransactionManager
 	memberRepository required.MemberRepository
 	emailSender      required.EmailSender
 	passwordEncoder  domain.PasswordEncoder
 }
 
 func NewMemberRegister(
+	client *ent.Client,
 	memberRepository required.MemberRepository,
 	emailSender required.EmailSender,
 	passwordEncoder domain.PasswordEncoder,
 ) provided.MemberRegister {
 	return &memberRegister{
+		tx:               required.NewTransactionManager(client),
 		memberRepository: memberRepository,
 		emailSender:      emailSender,
 		passwordEncoder:  passwordEncoder,
@@ -43,7 +47,7 @@ func (m *memberRegister) sendWelcomeEmail(ctx context.Context, member *domain.Me
 	return m.emailSender.Send(ctx, member.Email, "登録を完了してください", "下記のリンクをクリックして登録を完了してください")
 }
 
-func (m *memberRegister) checkDuplicateEmail(ctx context.Context, registerRequest *domain.MemberRegisterRequest) error {
+func (m *memberRegister) checkDuplicateEmail(ctx context.Context, tx *ent.Tx, registerRequest *domain.MemberRegisterRequest) error {
 	email, err := domain.NewEmail(registerRequest.Email)
 	if err != nil {
 		return err
@@ -55,31 +59,38 @@ func (m *memberRegister) checkDuplicateEmail(ctx context.Context, registerReques
 }
 
 func (m *memberRegister) Register(ctx context.Context, registerRequest *domain.MemberRegisterRequest) (*domain.Member, error) {
-	err := validateRequest(registerRequest)
+	var member *domain.Member
+	err := m.tx.WithTx(ctx, func(tx *ent.Tx) error {
+		err := validateRequest(registerRequest)
+		if err != nil {
+			return err
+		}
+
+		err = m.checkDuplicateEmail(ctx, tx, registerRequest)
+		if err != nil {
+			return err
+		}
+
+		member, err := domain.RegisterMember(registerRequest, m.passwordEncoder)
+		if err != nil {
+			return err
+		}
+
+		member, err = m.memberRepository.Save(ctx, tx, member)
+		if err != nil {
+			return err
+		}
+
+		err = m.sendWelcomeEmail(ctx, member)
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
 	if err != nil {
 		return nil, err
 	}
-
-	err = m.checkDuplicateEmail(ctx, registerRequest)
-	if err != nil {
-		return nil, err
-	}
-
-	member, err := domain.RegisterMember(registerRequest, m.passwordEncoder)
-	if err != nil {
-		return nil, err
-	}
-
-	member, err = m.memberRepository.Save(ctx, member)
-	if err != nil {
-		return nil, err
-	}
-
-	err = m.sendWelcomeEmail(ctx, member)
-	if err != nil {
-		return nil, err
-	}
-
 	return member, nil
 }
 

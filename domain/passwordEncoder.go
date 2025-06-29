@@ -1,3 +1,4 @@
+//go:generate mockgen -source=passwordEncoder.go -destination=mockPasswordEncoder.go -package=domain
 package domain
 
 type PasswordEncoder interface {

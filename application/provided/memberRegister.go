@@ -1,3 +1,4 @@
+//go:generate mockgen -source=memberRegister.go -destination=mockMemberRegister.go -package provided
 package provided
 
 import (

@@ -32,7 +32,13 @@ func TestMemberRepository_Save(t *testing.T) {
 	repo := NewMemberRepository(client)
 
 	member := domain.CreateTestMember(t)
-	savedMember, err := repo.Save(ctx, member)
+
+	tx, err := client.Tx(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	savedMember, err := repo.Save(ctx, tx, member)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -49,11 +55,17 @@ func TestMemberRepository_DuplicateEmailFail(t *testing.T) {
 	repo := NewMemberRepository(client)
 
 	member := domain.CreateTestMember(t)
-	_, err := repo.Save(ctx, member)
+	tx, err := client.Tx(ctx)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer tx.Rollback()
+
+	_, err = repo.Save(ctx, tx, member)
 	assert.NoError(t, err)
 
 	member2 := domain.CreateTestMember(t)
-	_, err = repo.Save(ctx, member2)
+	_, err = repo.Save(ctx, tx, member2)
 	assert.Error(t, err)
 	assert.True(t, ent.IsConstraintError(err))
 }
