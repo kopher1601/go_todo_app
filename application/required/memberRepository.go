@@ -12,7 +12,7 @@ import (
 // MemberRepository 会員の情報を保存や検索できる
 type MemberRepository interface {
 	Save(ctx context.Context, tx *ent.Tx, member *domain.Member) (*domain.Member, error)
-	FindByID(ctx context.Context, memberId string) (*domain.Member, error)
+	FindByID(ctx context.Context, memberId int) (*domain.Member, error)
 	Update(ctx context.Context, member *domain.Member) (*domain.Member, error)
 	FindByEmail(ctx context.Context, email domain.Email) (*domain.Member, error)
 }
@@ -56,8 +56,29 @@ func (m *memberRepository) Save(ctx context.Context, tx *ent.Tx, member *domain.
 	}, nil
 }
 
-func (m *memberRepository) FindByID(ctx context.Context, memberId string) (*domain.Member, error) {
-	panic("unimplemented")
+func (m *memberRepository) FindByID(ctx context.Context, memberId int) (*domain.Member, error) {
+	member, err := m.client.Member.Query().Where(member.ID(memberId)).First(ctx)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			return nil, nil
+		}
+		log.Println(err)
+		return nil, err
+	}
+
+	domainEmail, err := domain.NewEmail(member.Email)
+	if err != nil {
+		log.Println(err)
+		return nil, err
+	}
+
+	return &domain.Member{
+		ID:           member.ID,
+		Email:        domainEmail,
+		Nickname:     member.Nickname,
+		PasswordHash: member.PasswordHash,
+		Status:       domain.NewMemberStatus(member.Status),
+	}, nil
 }
 
 func (m *memberRepository) Update(ctx context.Context, member *domain.Member) (*domain.Member, error) {

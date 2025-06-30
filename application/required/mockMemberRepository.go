@@ -58,7 +58,7 @@ func (mr *MockMemberRepositoryMockRecorder) FindByEmail(ctx, email any) *gomock.
 }
 
 // FindByID mocks base method.
-func (m *MockMemberRepository) FindByID(ctx context.Context, memberId string) (*domain.Member, error) {
+func (m *MockMemberRepository) FindByID(ctx context.Context, memberId int) (*domain.Member, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "FindByID", ctx, memberId)
 	ret0, _ := ret[0].(*domain.Member)

@@ -3,10 +3,10 @@ package application
 import (
 	"context"
 	"fmt"
-	"goplearn/application/provided"
 	"goplearn/application/required"
 	"goplearn/domain"
 	"goplearn/ent"
+	"strconv"
 
 	"github.com/go-playground/validator/v10"
 )
@@ -23,7 +23,7 @@ func NewMemberRegister(
 	memberRepository required.MemberRepository,
 	emailSender required.EmailSender,
 	passwordEncoder domain.PasswordEncoder,
-) provided.MemberRegister {
+) *memberRegister {
 	return &memberRegister{
 		tx:               required.NewTransactionManager(client),
 		memberRepository: memberRepository,
@@ -41,6 +41,14 @@ func validateRequest(registerRequest *domain.MemberRegisterRequest) error {
 		return err
 	}
 	return nil
+}
+
+func (m *memberRegister) Find(ctx context.Context, memberID int) (*domain.Member, error) {
+	member, err := m.memberRepository.FindByID(ctx, memberID)
+	if err != nil {
+		return nil, err
+	}
+	return member, nil
 }
 
 func (m *memberRegister) sendWelcomeEmail(ctx context.Context, member *domain.Member) error {
@@ -71,17 +79,19 @@ func (m *memberRegister) Register(ctx context.Context, registerRequest *domain.M
 			return err
 		}
 
-		member, err := domain.RegisterMember(registerRequest, m.passwordEncoder)
+		newMember, err := domain.RegisterMember(registerRequest, m.passwordEncoder)
 		if err != nil {
 			return err
 		}
 
-		member, err = m.memberRepository.Save(ctx, tx, member)
+		savedMember, err := m.memberRepository.Save(ctx, tx, newMember)
 		if err != nil {
 			return err
 		}
 
-		err = m.sendWelcomeEmail(ctx, member)
+		member = savedMember
+
+		err = m.sendWelcomeEmail(ctx, savedMember)
 		if err != nil {
 			return err
 		}
@@ -95,7 +105,12 @@ func (m *memberRegister) Register(ctx context.Context, registerRequest *domain.M
 }
 
 func (m *memberRegister) Activate(ctx context.Context, memberId string) error {
-	member, err := m.memberRepository.FindByID(ctx, memberId)
+	memberIdInt, err := strconv.Atoi(memberId)
+	if err != nil {
+		return err
+	}
+
+	member, err := m.memberRepository.FindByID(ctx, memberIdInt)
 	if err != nil {
 		return err
 	}

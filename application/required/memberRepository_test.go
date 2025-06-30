@@ -34,17 +34,23 @@ func TestMemberRepository_Save(t *testing.T) {
 	member := domain.CreateTestMember(t)
 
 	tx, err := client.Tx(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
+	defer func() {
+		if v := recover(); v != nil {
+			tx.Rollback()
+			panic(v)
+		}
+	}()
 
 	savedMember, err := repo.Save(ctx, tx, member)
-	if err != nil {
-		t.Fatal(err)
-	}
+	require.NoError(t, err)
 	assert.NotNil(t, savedMember)
 	assert.NotNil(t, savedMember.ID)
 	assert.Equal(t, member.Email.Address, "kopher@goplearn.app")
+
+	// 트랜잭션 커밋
+	err = tx.Commit()
+	require.NoError(t, err)
 }
 
 func TestMemberRepository_DuplicateEmailFail(t *testing.T) {
@@ -55,17 +61,26 @@ func TestMemberRepository_DuplicateEmailFail(t *testing.T) {
 	repo := NewMemberRepository(client)
 
 	member := domain.CreateTestMember(t)
-	tx, err := client.Tx(ctx)
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer tx.Rollback()
 
-	_, err = repo.Save(ctx, tx, member)
-	assert.NoError(t, err)
+	// 첫 번째 멤버 저장
+	tx1, err := client.Tx(ctx)
+	require.NoError(t, err)
 
+	savedMember, err := repo.Save(ctx, tx1, member)
+	require.NoError(t, err)
+	assert.NotNil(t, savedMember)
+
+	// 첫 번째 트랜잭션 커밋
+	err = tx1.Commit()
+	require.NoError(t, err)
+
+	// 두 번째 멤버 저장 (같은 이메일)
 	member2 := domain.CreateTestMember(t)
-	_, err = repo.Save(ctx, tx, member2)
+	tx2, err := client.Tx(ctx)
+	require.NoError(t, err)
+	defer tx2.Rollback()
+
+	_, err = repo.Save(ctx, tx2, member2)
 	assert.Error(t, err)
 	assert.True(t, ent.IsConstraintError(err))
 }
