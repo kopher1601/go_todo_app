@@ -12,6 +12,7 @@ type Member struct {
 	Nickname     string
 	PasswordHash string
 	Status       MemberStatus
+	Detail       *MemberDetail // ID 를 갖는게 좋을까?
 }
 
 func RegisterMember(registerRequest *MemberRegisterRequest, passwordEncoder PasswordEncoder) (*Member, error) {

@@ -20,6 +20,7 @@ _Entity_
 - `nickname`: 닉네임
 - `passwordHash`: 비밀번호 해시
 - `status`: 회원 상태(`MemberStatus`)
+- `detail`: `MemberDetail` 1:1
 
 #### 행위
 - `private constructor()`: 회원 등록: email, nickname, passwordHash
@@ -36,6 +37,17 @@ _Entity_
 - 등록 대기 상태에서만 등록 완료가 될 수 있다
 - 등록 완료 상태에서는 탈퇴할 수 있다
 - 회원의 비밀번호는 해시를 만들어서 저장한다
+
+### 회원 상세(`MemberDetail`)
+- `id`: `int`
+- `profile`: 프로필 주소
+- `introduction`: 자기 소개
+- `registeredAt`: 등록 일시
+- `activatedAt` : 등록 완료 일시
+- `deactivatedAt` : 탈퇴 일시
+
+#### 행위
+- 
 
 ### ErrDuplicateEmail
 _Exception_
